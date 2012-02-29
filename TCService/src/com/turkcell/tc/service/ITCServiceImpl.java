@@ -20,8 +20,10 @@ public class ITCServiceImpl extends ITCService.Stub {
 					p.getInputStream()));
 			String line;
 			while ((line = in.readLine()) != null) {
-				ret.append(line);
+				ret.append(line+"\n");
+				Log.d(TAG, "reading line: "+line);
 			}
+			Log.d(TAG, "executeCommand returning: "+ret.toString());
 			return ret.toString();
 		} catch (IOException e) {
 			String message = "Failed to execute command: " + command;
