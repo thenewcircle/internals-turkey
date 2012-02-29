@@ -24,6 +24,7 @@ public class AnyClientActivity extends Activity {
 	EditText in;
 	TextView out;
 	ITCService service;
+	ITCServiceConnection serviceConnection;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -34,11 +35,23 @@ public class AnyClientActivity extends Activity {
 		in = (EditText) findViewById(R.id.in);
 		out = (TextView) findViewById(R.id.out);
 
+		serviceConnection = new ITCServiceConnection();
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 		// Bind to the service
 		boolean isBound = bindService(new Intent(
 				"com.turkcell.tc.common.ITCService").putExtra("caller", TAG),
-				new ITCServiceConnection(), Context.BIND_AUTO_CREATE);
-		Log.d(TAG, "onCreate isBound: " + isBound);
+				serviceConnection, Context.BIND_AUTO_CREATE);
+		Log.d(TAG, "onStart isBound: " + isBound);
+	}
+
+	@Override
+	protected void onStop() {
+		unbindService(serviceConnection);
+		super.onStop();
 	}
 
 	/** Called when Execute button is clicked. */
