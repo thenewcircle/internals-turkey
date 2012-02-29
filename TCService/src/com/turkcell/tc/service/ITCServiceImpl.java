@@ -8,9 +8,12 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.turkcell.tc.common.ITCService;
+import com.turkcell.tc.common.ITCServiceListener;
+import com.turkcell.tc.common.TCResponse;
 
 public class ITCServiceImpl extends ITCService.Stub {
 	static final String TAG = "ITCServiceImpl";
+	static final String ERROR = "ERROR";
 
 	public String executeCommand(String command) throws RemoteException {
 		try {
@@ -20,15 +23,38 @@ public class ITCServiceImpl extends ITCService.Stub {
 					p.getInputStream()));
 			String line;
 			while ((line = in.readLine()) != null) {
-				ret.append(line+"\n");
-				Log.d(TAG, "reading line: "+line);
+				ret.append(line + "\n");
+				Log.d(TAG, "reading line: " + line);
 			}
-			Log.d(TAG, "executeCommand returning: "+ret.toString());
+			Log.d(TAG, "executeCommand returning: " + ret.toString());
 			return ret.toString();
 		} catch (IOException e) {
 			String message = "Failed to execute command: " + command;
 			Log.e(TAG, message, e);
 			return message;
+		}
+	}
+
+	public void executeAsync(String command, ITCServiceListener listener)
+			throws RemoteException {
+		try {
+			Log.d(TAG, "executeAsync with thread id: "
+					+ Thread.currentThread().getId());
+			Process p = Runtime.getRuntime().exec(command);
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
+			String line;
+			TCResponse response;
+			while ((line = in.readLine()) != null) {
+				response = new TCResponse(System.currentTimeMillis(), TAG, line);
+				listener.onResponse(response);
+			}
+			Log.d(TAG, "executeCommand done");
+		} catch (IOException e) {
+			String message = "Failed to execute command: " + command;
+			Log.e(TAG, message, e);
+			listener.onError(new TCResponse(System.currentTimeMillis(), ERROR,
+					message));
 		}
 	}
 }
