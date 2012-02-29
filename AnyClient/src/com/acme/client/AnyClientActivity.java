@@ -1,30 +1,23 @@
 package com.acme.client;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.turkcell.tc.common.ITCService;
 import com.turkcell.tc.common.ITCServiceListener;
+import com.turkcell.tc.common.TCManager;
 import com.turkcell.tc.common.TCResponse;
 
 public class AnyClientActivity extends Activity {
 	static final String TAG = "AnyClientActivity";
 	EditText in;
 	TextView out;
-	ITCService service;
-	ITCServiceConnection serviceConnection;
+	TCManager manager;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -34,36 +27,26 @@ public class AnyClientActivity extends Activity {
 
 		in = (EditText) findViewById(R.id.in);
 		out = (TextView) findViewById(R.id.out);
-
-		serviceConnection = new ITCServiceConnection();
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		// Bind to the service
-		boolean isBound = bindService(new Intent(
-				"com.turkcell.tc.common.ITCService").putExtra("caller", TAG),
-				serviceConnection, Context.BIND_AUTO_CREATE);
-		Log.d(TAG, "onStart isBound: " + isBound);
+		manager = TCManager.getInstance(this);
 	}
 
 	@Override
 	protected void onStop() {
-		unbindService(serviceConnection);
 		super.onStop();
+		manager.release();
 	}
 
 	/** Called when Execute button is clicked. */
 	public void onExecute(View v) {
 		String command = in.getText().toString();
 
-		// Call remote service
-		try {
-			service.executeAsync(command, new TCServiceListner() );
-		} catch (RemoteException e) {
-			Log.e(TAG, "Failed to execute: " + command, e);
-		}
+		// Call service
+		manager.executeAsync(command, new TCServiceListner());
 	}
 
 	public void onClear(View v) {
@@ -71,30 +54,16 @@ public class AnyClientActivity extends Activity {
 		out.setText("");
 	}
 
-	/** Responsible for handling the service responses.
-	 * Runs on UI thread.
+	/**
+	 * Responsible for handling the service responses. Runs on UI thread.
 	 */
 	final Handler responseHandler = new Handler() {
 
 		@Override
 		public void handleMessage(Message msg) {
-			out.append( (String)msg.obj);
-		}		
+			out.append((String) msg.obj);
+		}
 	};
-	
-	/** Responsible for handling the connection/disconnection from ITCService. */
-	class ITCServiceConnection implements ServiceConnection {
-
-		public void onServiceConnected(ComponentName name, IBinder binder) {
-			service = ITCService.Stub.asInterface(binder);
-			Log.d(TAG, "onServiceConnected");
-		}
-
-		public void onServiceDisconnected(ComponentName name) {
-			Log.d(TAG, "onServiceDisconnected");
-			service = null; 
-		}
-	}
 
 	/** Listener for callbacks from the ITCService. */
 	class TCServiceListner extends ITCServiceListener.Stub {
@@ -109,6 +78,6 @@ public class AnyClientActivity extends Activity {
 			Message msg = new Message();
 			msg.obj = "\n" + response.getLine();
 			responseHandler.sendMessage(msg);
-		}		
+		}
 	}
 }
