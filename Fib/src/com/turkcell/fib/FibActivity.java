@@ -36,14 +36,17 @@ public class FibActivity extends Activity {
 		long fibN = FibLib.fibN(n);
 		long timeN = System.currentTimeMillis() - start;
 		output.append(String.format("\nfibN(%d)=%d (%d ms)", n, fibN, timeN));
-		/*
-		 * // Iterative start = System.nanoTime(); long fibJI = FibLib.fibJI(n);
-		 * long timeJI = System.nanoTime() - start; output.append(
-		 * String.format("\nfibJI(%d)=%d (%d ns)", n, fibJI, timeJI ) );
-		 * 
-		 * start = System.nanoTime(); long fibNI = FibLib.fibNI(n); long timeNI
-		 * = System.nanoTime() - start; output.append(
-		 * String.format("\nfibNI(%d)=%d (%d ms)", n, fibNI, timeNI ) );
-		 */
+
+		// Iterative
+		start = System.nanoTime();
+		long fibJI = FibLib.fibJI(n);
+		long timeJI = System.nanoTime() - start;
+		output.append(String.format("\nfibJI(%d)=%d (%d ns)", n, fibJI, timeJI));
+
+		start = System.nanoTime();
+		long fibNI = FibLib.fibNI(n);
+		long timeNI = System.nanoTime() - start;
+		output.append(String.format("\nfibNI(%d)=%d (%d ms)", n, fibNI, timeNI));
+
 	}
 }

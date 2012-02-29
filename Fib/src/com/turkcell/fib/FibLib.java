@@ -10,7 +10,7 @@ public class FibLib {
 		return fibJ(n - 1) + fibJ(n - 2);
 	}
 
-	public static long fibJI(long n) { //
+	public static long fibJI(long n) { 
 		long previous = -1;
 		long result = 1;
 		for (long i = 0; i <= n; i++) {
