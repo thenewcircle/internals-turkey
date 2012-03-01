@@ -11,7 +11,7 @@ public class TCService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		Log.d(TAG, "onBind from: "+intent.getStringExtra("caller"));
-		return new ITCServiceImpl();
+		return new ITCServiceImpl(this);
 	}
 }
 

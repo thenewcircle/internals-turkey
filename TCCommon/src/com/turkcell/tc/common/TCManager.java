@@ -49,6 +49,14 @@ public class TCManager {
 		}
 	}
 
+	public void executeCommand(String command) {
+		try {
+			service.executeCommand(command);
+		} catch (RemoteException e) {
+			Log.e(TAG, "Failed to execute: " + command, e);
+		}
+	}
+	
 	/** Responsible for handling the connection/disconnection from ITCService. */
 	class ITCServiceConnection implements ServiceConnection {
 

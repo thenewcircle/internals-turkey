@@ -6,14 +6,21 @@
 
     <uses-sdk android:minSdkVersion="7" />
 
+    <permission
+        android:name="com.turkcell.tc.permission.ACCESS_SERVICE"
+        android:protectionLevel="signatureOrSystem" />
+    <permission
+        android:name="com.turkcell.tc.permission.ACCESS_SERVICE_ASYNC"
+        android:protectionLevel="signatureOrSystem" />
+
     <application android:label="@string/app_name" >
-        
-        <service android:name=".TCService">
+        <service
+            android:name=".TCService"
+            android:permission="com.turkcell.tc.permission.ACCESS_SERVICE" >
             <intent-filter>
-                <action android:name="com.turkcell.tc.common.ITCService"/>
+                <action android:name="com.turkcell.tc.common.ITCService" />
             </intent-filter>
         </service>
-        
     </application>
 
 </manifest>
